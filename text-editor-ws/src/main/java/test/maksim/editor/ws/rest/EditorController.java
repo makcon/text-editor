@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import test.maksim.editor.common.constants.Endpoints;
 import test.maksim.editor.common.dto.*;
 import test.maksim.editor.ws.service.EditorService;
+import test.maksim.editor.ws.service.LinesSearchService;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class EditorController {
 
     private final EditorService editorService;
+    private final LinesSearchService searchService;
     private final AsyncListenableTaskExecutor serviceExecutor;
 
     @PostMapping(Endpoints.SAVE_TEXTS)
@@ -27,11 +29,11 @@ public class EditorController {
         return serviceExecutor.submitListenable(() -> editorService.saveTexts(requests));
     }
 
-    @GetMapping(Endpoints.FIND_LINE)
-    public ListenableFuture<Optional<String>> findLine(@RequestParam("textId") String textId,
-                                                       @RequestParam("lineNumber") int lineNumber) {
+    @GetMapping(Endpoints.GET_LINE)
+    public ListenableFuture<Optional<String>> getLine(@RequestParam("textId") String textId,
+                                                      @RequestParam("lineNumber") int lineNumber) {
         log.info("Received request to find line {} of text: {}", lineNumber, textId);
-        return serviceExecutor.submitListenable(() -> editorService.findByLineNumber(textId, lineNumber));
+        return serviceExecutor.submitListenable(() -> editorService.getByLineNumber(textId, lineNumber));
     }
 
     @PutMapping(Endpoints.ADD_LINES)
@@ -57,5 +59,12 @@ public class EditorController {
     public void deleteLines(@RequestBody List<DeleteLinesRequest> requests) {
         log.info("Receive {} delete lines requests", requests.size());
         serviceExecutor.submitListenable(() -> editorService.deleteLines(requests));
+    }
+
+    @GetMapping(Endpoints.FIND_LINES)
+    public ListenableFuture<List<String>> findLines(@RequestParam("textId") String textId,
+                                                    @RequestParam("query") String query) {
+        log.info("Received request to find lines of text: {}, query: {}", textId, query);
+        return serviceExecutor.submitListenable(() -> searchService.search(textId, query));
     }
 }

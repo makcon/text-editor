@@ -26,9 +26,9 @@ public class EditorService {
                 .collect(toList());
     }
 
-    public Optional<String> findByLineNumber(String textId,
-                                             int lineNumber) {
-        return textRepository.findByLineNumber(textId, lineNumber);
+    public Optional<String> getByLineNumber(String textId,
+                                            int lineNumber) {
+        return textRepository.getByLineNumber(textId, lineNumber);
     }
 
     public void addLines(List<AddLineRequest> requests) {

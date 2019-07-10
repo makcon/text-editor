@@ -46,13 +46,13 @@ public class EditorServiceTest {
 
     @Test
     public void findByLineNumber_shouldCallRepositoryAndReturnLine() {
-        when(textRepository.findByLineNumber(anyString(), anyInt())).thenReturn(Optional.of(LINE_1));
+        when(textRepository.getByLineNumber(anyString(), anyInt())).thenReturn(Optional.of(LINE_1));
 
-        Optional<String> line = service.findByLineNumber(TEXT_ID, 1);
+        Optional<String> line = service.getByLineNumber(TEXT_ID, 1);
 
         assertThat(line.isPresent(), is(true));
         assertThat(line.get(), equalTo(LINE_1));
-        verify(textRepository).findByLineNumber(TEXT_ID, 1);
+        verify(textRepository).getByLineNumber(TEXT_ID, 1);
     }
 
     @Test

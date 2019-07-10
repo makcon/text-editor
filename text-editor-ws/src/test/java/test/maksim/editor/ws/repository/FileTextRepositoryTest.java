@@ -45,9 +45,9 @@ public class FileTextRepositoryTest {
     public void findByLineNumber_saved2Lines_shouldReturn2First() {
         String textId = saveLines(List.of(LINE_1, LINE_2));
 
-        Optional<String> line1 = repository.findByLineNumber(textId, 1);
-        Optional<String> line2 = repository.findByLineNumber(textId, 2);
-        Optional<String> line3 = repository.findByLineNumber(textId, 3);
+        Optional<String> line1 = repository.getByLineNumber(textId, 1);
+        Optional<String> line2 = repository.getByLineNumber(textId, 2);
+        Optional<String> line3 = repository.getByLineNumber(textId, 3);
 
         assertThat(line1.isPresent(), is(true));
         assertThat(line2.isPresent(), is(true));
@@ -58,7 +58,7 @@ public class FileTextRepositoryTest {
 
     @Test
     public void findByLineNumber_textNotFound_shouldReturnEmpty() {
-        Optional<String> line1 = repository.findByLineNumber("unknownId", 1);
+        Optional<String> line1 = repository.getByLineNumber("unknownId", 1);
 
         assertThat(line1.isPresent(), is(false));
     }
@@ -117,8 +117,8 @@ public class FileTextRepositoryTest {
 
         List<String> allLines = repository.getAllLines(textId);
         assertThat(allLines, equalTo(List.of(LINE_2, LINE_4)));
-        Optional<String> line2 = repository.findByLineNumber(textId, 1);
-        Optional<String> line4 = repository.findByLineNumber(textId, 2);
+        Optional<String> line2 = repository.getByLineNumber(textId, 1);
+        Optional<String> line4 = repository.getByLineNumber(textId, 2);
         assertThat(line2.isPresent(), is(true));
         assertThat(line4.isPresent(), is(true));
         assertThat(line2.get(), equalTo(LINE_2));

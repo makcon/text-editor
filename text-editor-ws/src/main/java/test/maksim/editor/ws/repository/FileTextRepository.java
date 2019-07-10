@@ -34,8 +34,8 @@ public class FileTextRepository implements TextRepository {
     }
 
     @Override
-    public Optional<String> findByLineNumber(String textId,
-                                             int lineNumber) {
+    public Optional<String> getByLineNumber(String textId,
+                                            int lineNumber) {
         return Files.notExists(buildLineFilePath(textId, lineNumber))
                 ? Optional.empty()
                 : Optional.ofNullable(readLines(buildLineFilePath(textId, lineNumber)).get(0));
@@ -95,6 +95,15 @@ public class FileTextRepository implements TextRepository {
         reorganizeLineFiles(textId);
     }
 
+    public List<Path> getLinePaths(String textId) {
+        try (Stream<Path> files = Files.list(buildTextFolderPath(textId))){
+            return files.collect(toList());
+        } catch (IOException e) {
+            log.error("Failed to get files for text: {}", textId, e);
+            throw new RuntimeException(e);
+        }
+    }
+
     private void reorganizeLineFiles(String textId) {
         List<Path> linePaths = getLinePaths(textId);
         for (int i = 0; i < linePaths.size(); i++) {
@@ -120,8 +129,8 @@ public class FileTextRepository implements TextRepository {
     }
 
     private List<String> readLines(Path path) {
-        try (Stream<String> stream = Files.lines(path)) {
-            return stream.collect(toList());
+        try {
+            return Files.readAllLines(path);
         } catch (IOException e) {
             log.error("Failed to read file: {}", path, e);
             throw new RuntimeException(e);
@@ -167,14 +176,5 @@ public class FileTextRepository implements TextRepository {
     private Path buildLineFilePath(String textId,
                                    int lineNumber) {
         return Path.of(textsFolder, File.separator, textId, File.separator, String.valueOf(lineNumber));
-    }
-
-    private List<Path> getLinePaths(String textId) {
-        try (Stream<Path> files = Files.list(buildTextFolderPath(textId))){
-            return files.collect(toList());
-        } catch (IOException e) {
-            log.error("Failed to get files for text: {}", textId, e);
-            throw new RuntimeException(e);
-        }
     }
 }

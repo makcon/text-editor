@@ -9,8 +9,8 @@ public interface TextRepository {
 
     String save(List<String> lines);
 
-    Optional<String> findByLineNumber(String textId,
-                                      int lineNumber);
+    Optional<String> getByLineNumber(String textId,
+                                     int lineNumber);
 
     List<String> getAllLines(String textId);
 
