@@ -8,10 +8,12 @@ import test.maksim.editor.common.dto.ModifyLinesRequest.ModifiedLine;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 @Component
 @Slf4j
@@ -51,7 +53,7 @@ public class FileTextRepository implements TextRepository {
                     .filter(Files::isRegularFile)
                     .map(this::readLines)
                     .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
+                    .collect(toList());
         } catch (IOException e) {
             log.error("Failed to read text: {}", textId, e);
             throw new RuntimeException(e);
@@ -86,9 +88,40 @@ public class FileTextRepository implements TextRepository {
         return modifiedLines;
     }
 
+    @Override
+    public void deleteLines(String textId,
+                            List<Integer> lineNumbers) {
+        lineNumbers.forEach(it -> deleteLine(textId, it));
+        reorganizeLineFiles(textId);
+    }
+
+    private void reorganizeLineFiles(String textId) {
+        List<Path> linePaths = getLinePaths(textId);
+        for (int i = 0; i < linePaths.size(); i++) {
+            try {
+                Files.move(linePaths.get(i), buildLineFilePath(textId, i + 1));
+            } catch (IOException e) {
+                log.error("Failed to rename file: {}", linePaths.get(i), e);
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void deleteLine(String textId,
+                            Integer lineNumber) {
+        try {
+            Files.delete(buildLineFilePath(textId, lineNumber));
+        } catch (NoSuchFileException e) {
+            log.warn("File not found: {}", buildLineFilePath(textId, lineNumber));
+        } catch (IOException e) {
+            log.error("Failed to delete file: {}", lineNumber, e);
+            throw new RuntimeException(e);
+        }
+    }
+
     private List<String> readLines(Path path) {
         try (Stream<String> stream = Files.lines(path)) {
-            return stream.collect(Collectors.toList());
+            return stream.collect(toList());
         } catch (IOException e) {
             log.error("Failed to read file: {}", path, e);
             throw new RuntimeException(e);
@@ -134,5 +167,14 @@ public class FileTextRepository implements TextRepository {
     private Path buildLineFilePath(String textId,
                                    int lineNumber) {
         return Path.of(textsFolder, File.separator, textId, File.separator, String.valueOf(lineNumber));
+    }
+
+    private List<Path> getLinePaths(String textId) {
+        try (Stream<Path> files = Files.list(buildTextFolderPath(textId))){
+            return files.collect(toList());
+        } catch (IOException e) {
+            log.error("Failed to get files for text: {}", textId, e);
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -52,4 +52,10 @@ public class EditorController {
         log.info("Received request to concatenate text: {} by symbol: {}", textId, symbol);
         return serviceExecutor.submitListenable(() -> editorService.concatenate(textId, symbol));
     }
+
+    @PutMapping(Endpoints.DELETE_LINES)
+    public void deleteLines(@RequestBody List<DeleteLinesRequest> requests) {
+        log.info("Receive {} delete lines requests", requests.size());
+        serviceExecutor.submitListenable(() -> editorService.deleteLines(requests));
+    }
 }

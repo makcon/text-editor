@@ -49,6 +49,10 @@ public class EditorService {
                 : Optional.of(String.join(symbol.getSymbol(), allLines));
     }
 
+    public void deleteLines(List<DeleteLinesRequest> requests) {
+        requests.forEach(it -> textRepository.deleteLines(it.getTextId(), it.getLineNumbers()));
+    }
+
     private SaveTextResponse saveText(SaveTextRequest request) {
         String textId = textRepository.save(request.getLines());
         log.info("Text with id: {} is created", textId);

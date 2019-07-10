@@ -19,4 +19,7 @@ public interface TextRepository {
 
     List<Integer> modifyLines(String textId,
                               List<ModifiedLine> lines);
+
+    void deleteLines(String textId,
+                     List<Integer> lineNumbers);
 }

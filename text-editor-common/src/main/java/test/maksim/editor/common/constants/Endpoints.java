@@ -11,4 +11,5 @@ public class Endpoints {
     public static final String ADD_LINES = V1_PREFIX + "/texts/add/lines";
     public static final String MODIFY_LINES = V1_PREFIX + "/texts/modify/lines";
     public static final String CONCATENATE = V1_PREFIX + "/text/concatenate";
+    public static final String DELETE_LINES = V1_PREFIX + "/texts/delete/lines";
 }

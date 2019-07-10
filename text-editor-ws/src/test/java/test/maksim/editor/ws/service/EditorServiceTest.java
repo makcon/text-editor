@@ -5,10 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import test.maksim.editor.common.dto.AddLineRequest;
-import test.maksim.editor.common.dto.ModifyLinesRequest;
-import test.maksim.editor.common.dto.SaveTextRequest;
-import test.maksim.editor.common.dto.SaveTextResponse;
+import test.maksim.editor.common.dto.*;
 import test.maksim.editor.ws.repository.TextRepository;
 
 import java.util.List;
@@ -37,7 +34,7 @@ public class EditorServiceTest {
     private TextRepository textRepository;
 
     @Test
-    public void saveText() {
+    public void saveText_shouldCallRepositoryAndReturnReposponse() {
         when(textRepository.save(anyList())).thenReturn(TEXT_ID);
         List<String> lines = List.of(LINE_1);
 
@@ -48,7 +45,7 @@ public class EditorServiceTest {
     }
 
     @Test
-    public void findByLineNumber() {
+    public void findByLineNumber_shouldCallRepositoryAndReturnLine() {
         when(textRepository.findByLineNumber(anyString(), anyInt())).thenReturn(Optional.of(LINE_1));
 
         Optional<String> line = service.findByLineNumber(TEXT_ID, 1);
@@ -59,14 +56,14 @@ public class EditorServiceTest {
     }
 
     @Test
-    public void addLines() {
+    public void addLines_shouldCallRepository() {
         service.addLines(List.of(new AddLineRequest(TEXT_ID, List.of(LINE_1))));
 
         verify(textRepository).addLines(TEXT_ID, List.of(LINE_1));
     }
 
     @Test
-    public void modifyLines() {
+    public void modifyLines_shouldCallRepositoryAndReturnModifiedLines() {
         List<Integer> modifiedLines = List.of(2);
         when(textRepository.modifyLines(anyString(), anyList())).thenReturn(modifiedLines);
         List<ModifyLinesRequest.ModifiedLine> lines = List.of(new ModifyLinesRequest.ModifiedLine(2, LINE_1));
@@ -96,5 +93,12 @@ public class EditorServiceTest {
 
         assertThat(concatenated.isPresent(), is(false));
         verify(textRepository).getAllLines(TEXT_ID);
+    }
+
+    @Test
+    public void deleteLines_shouldCallRepository() {
+        service.deleteLines(List.of(new DeleteLinesRequest(TEXT_ID, List.of(1))));
+
+        verify(textRepository).deleteLines(TEXT_ID, List.of(1));
     }
 }

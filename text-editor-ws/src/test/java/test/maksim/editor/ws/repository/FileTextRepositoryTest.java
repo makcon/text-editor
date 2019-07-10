@@ -20,6 +20,7 @@ public class FileTextRepositoryTest {
     private static final String LINE_1 = "line1";
     private static final String LINE_2 = "line2";
     private static final String LINE_3 = "line3";
+    private static final String LINE_4 = "line4";
 
     private final FileTextRepository repository = new FileTextRepository();
 
@@ -106,6 +107,32 @@ public class FileTextRepositoryTest {
         assertThat(modifyLines, equalTo(List.of(1)));
         List<String> allLines = repository.getAllLines(textId);
         assertThat(allLines, equalTo(List.of(LINE_3, LINE_2)));
+    }
+
+    @Test
+    public void deleteLines_saved4Lines_delete2_shouldReturn2() {
+        String textId = saveLines(List.of(LINE_1, LINE_2, LINE_3, LINE_4));
+
+        repository.deleteLines(textId, List.of(1, 3));
+
+        List<String> allLines = repository.getAllLines(textId);
+        assertThat(allLines, equalTo(List.of(LINE_2, LINE_4)));
+        Optional<String> line2 = repository.findByLineNumber(textId, 1);
+        Optional<String> line4 = repository.findByLineNumber(textId, 2);
+        assertThat(line2.isPresent(), is(true));
+        assertThat(line4.isPresent(), is(true));
+        assertThat(line2.get(), equalTo(LINE_2));
+        assertThat(line4.get(), equalTo(LINE_4));
+    }
+
+    @Test
+    public void deleteLines_saved2Lines_deleteUnknown_shouldDeleteNothing() {
+        String textId = saveLines(List.of(LINE_1, LINE_2));
+
+        repository.deleteLines(textId, List.of(3));
+
+        List<String> allLines = repository.getAllLines(textId);
+        assertThat(allLines, equalTo(List.of(LINE_1, LINE_2)));
     }
 
     // Util methods
