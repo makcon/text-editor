@@ -12,6 +12,7 @@ import test.maksim.editor.common.dto.SaveTextResponse;
 import test.maksim.editor.ws.repository.TextRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -40,9 +41,9 @@ public class EditorServiceTest {
         when(textRepository.save(anyList())).thenReturn(TEXT_ID);
         List<String> lines = List.of(LINE_1);
 
-        SaveTextResponse response = service.saveText(new SaveTextRequest(lines));
+        List<SaveTextResponse> responses = service.saveTexts(List.of(new SaveTextRequest(lines)));
 
-        assertThat(response, equalTo(new SaveTextResponse(TEXT_ID, 1)));
+        assertThat(responses, equalTo(List.of(new SaveTextResponse(TEXT_ID, 1))));
         verify(textRepository).save(lines);
     }
 
@@ -59,7 +60,7 @@ public class EditorServiceTest {
 
     @Test
     public void addLines() {
-        service.addLines(new AddLineRequest(TEXT_ID, List.of(LINE_1)));
+        service.addLines(List.of(new AddLineRequest(TEXT_ID, List.of(LINE_1))));
 
         verify(textRepository).addLines(TEXT_ID, List.of(LINE_1));
     }
@@ -70,9 +71,9 @@ public class EditorServiceTest {
         when(textRepository.modifyLines(anyString(), anyList())).thenReturn(modifiedLines);
         List<ModifyLinesRequest.ModifiedLine> lines = List.of(new ModifyLinesRequest.ModifiedLine(2, LINE_1));
 
-        List<Integer> actualModifiedLines = service.modifyLines(new ModifyLinesRequest(TEXT_ID, lines));
+        Map<String, List<Integer>> actualModifiedLines = service.modifyLines(List.of(new ModifyLinesRequest(TEXT_ID, lines)));
 
-        assertThat(actualModifiedLines, equalTo(modifiedLines));
+        assertThat(actualModifiedLines, equalTo(Map.of(TEXT_ID, modifiedLines)));
         verify(textRepository).modifyLines(TEXT_ID, lines);
     }
 

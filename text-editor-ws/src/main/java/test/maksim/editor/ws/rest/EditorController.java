@@ -10,6 +10,7 @@ import test.maksim.editor.common.dto.*;
 import test.maksim.editor.ws.service.EditorService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -20,10 +21,10 @@ public class EditorController {
     private final EditorService editorService;
     private final AsyncListenableTaskExecutor serviceExecutor;
 
-    @PostMapping(Endpoints.SAVE_TEXT)
-    public ListenableFuture<SaveTextResponse> saveText(@RequestBody SaveTextRequest request) {
-        log.info("Receive save text request to save {} lines", request.getLines().size());
-        return serviceExecutor.submitListenable(() -> editorService.saveText(request));
+    @PostMapping(Endpoints.SAVE_TEXTS)
+    public ListenableFuture<List<SaveTextResponse>> saveText(@RequestBody List<SaveTextRequest> requests) {
+        log.info("Receive {} save text requests", requests.size());
+        return serviceExecutor.submitListenable(() -> editorService.saveTexts(requests));
     }
 
     @GetMapping(Endpoints.FIND_LINE)
@@ -34,15 +35,15 @@ public class EditorController {
     }
 
     @PutMapping(Endpoints.ADD_LINES)
-    public void addLines(@RequestBody AddLineRequest request) {
-        log.info("Receive add lines request for text {}", request.getTextId());
-        serviceExecutor.submitListenable(() -> editorService.addLines(request));
+    public void addLines(@RequestBody List<AddLineRequest> requests) {
+        log.info("Receive {} add lines requests", requests.size());
+        serviceExecutor.submitListenable(() -> editorService.addLines(requests));
     }
 
     @PutMapping(Endpoints.MODIFY_LINES)
-    public ListenableFuture<List<Integer>> modifyLines(@RequestBody ModifyLinesRequest request) {
-        log.info("Receive modify lines request for text {}", request.getTextId());
-        return serviceExecutor.submitListenable(() -> editorService.modifyLines(request));
+    public ListenableFuture<Map<String, List<Integer>>> modifyLines(@RequestBody List<ModifyLinesRequest> requests) {
+        log.info("Receive {} modify lines requests", requests.size());
+        return serviceExecutor.submitListenable(() -> editorService.modifyLines(requests));
     }
 
     @GetMapping(Endpoints.CONCATENATE)
