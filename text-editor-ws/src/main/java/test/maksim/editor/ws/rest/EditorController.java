@@ -1,5 +1,6 @@
 package test.maksim.editor.ws.rest;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.AsyncListenableTaskExecutor;
@@ -17,6 +18,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api
 public class EditorController {
 
     private final EditorService editorService;
