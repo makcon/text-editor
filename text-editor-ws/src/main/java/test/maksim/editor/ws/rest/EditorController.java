@@ -7,6 +7,7 @@ import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.*;
 import test.maksim.editor.common.constants.Endpoints;
+import test.maksim.editor.common.constants.RequestParams;
 import test.maksim.editor.common.dto.*;
 import test.maksim.editor.ws.service.EditorService;
 import test.maksim.editor.ws.service.LinesSearchService;
@@ -32,8 +33,8 @@ public class EditorController {
     }
 
     @GetMapping(Endpoints.GET_LINE)
-    public ListenableFuture<Optional<String>> getLine(@RequestParam("textId") String textId,
-                                                      @RequestParam("lineNumber") int lineNumber) {
+    public ListenableFuture<Optional<String>> getLine(@RequestParam(RequestParams.TEXT_ID) String textId,
+                                                      @RequestParam(RequestParams.LINE_NUMBER) int lineNumber) {
         log.info("Received request to find line {} of text: {}", lineNumber, textId);
         return serviceExecutor.submitListenable(() -> editorService.getByLineNumber(textId, lineNumber));
     }
@@ -51,21 +52,21 @@ public class EditorController {
     }
 
     @GetMapping(Endpoints.CONCATENATE)
-    public ListenableFuture<Optional<String>> concatenate(@RequestParam("textId") String textId,
-                                                          @RequestParam("symbol") ConcatenateSymbol symbol) {
+    public ListenableFuture<Optional<String>> concatenate(@RequestParam(RequestParams.TEXT_ID) String textId,
+                                                          @RequestParam(RequestParams.CONCATENATE_SYMBOL) ConcatenateSymbol symbol) {
         log.info("Received request to concatenate text: {} by symbol: {}", textId, symbol);
         return serviceExecutor.submitListenable(() -> editorService.concatenate(textId, symbol));
     }
 
-    @PutMapping(Endpoints.DELETE_LINES)
+    @DeleteMapping(Endpoints.DELETE_LINES)
     public void deleteLines(@RequestBody List<DeleteLinesRequest> requests) {
         log.info("Receive {} delete lines requests", requests.size());
         serviceExecutor.submitListenable(() -> editorService.deleteLines(requests));
     }
 
     @GetMapping(Endpoints.FIND_LINES)
-    public ListenableFuture<List<String>> findLines(@RequestParam("textId") String textId,
-                                                    @RequestParam("query") String query) {
+    public ListenableFuture<List<String>> findLines(@RequestParam(RequestParams.TEXT_ID) String textId,
+                                                    @RequestParam(RequestParams.QUERY) String query) {
         log.info("Received request to find lines of text: {}, query: {}", textId, query);
         return serviceExecutor.submitListenable(() -> searchService.search(textId, query));
     }

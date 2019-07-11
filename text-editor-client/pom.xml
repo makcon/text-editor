@@ -11,4 +11,21 @@
 
     <artifactId>text-editor-client</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>test.maksim</groupId>
+            <artifactId>text-editor-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
